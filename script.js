@@ -619,7 +619,7 @@ const previousBtn = document.getElementById('previous-btn');
 let editor = CodeMirror.fromTextArea(document.getElementById('user-code'), {
     mode: "javascript",
     theme: "monokai",
-    lineNumbers: true, // Re-enabled line numbers for better navigation
+    lineNumbers: false,
     gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
     indentUnit: 4,
     tabSize: 4,
