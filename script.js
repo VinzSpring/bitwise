@@ -576,9 +576,14 @@ const problems = [
 ];
 
 // Initialize Variables
+// script.js
+
+// Initialize Variables
 let currentProblemIndex = 0;
 let score = 0;
 let level = 1;
+let problemStartTime;
+let solvedProblems = [];
 
 // DOM Elements
 const problemTitle = document.getElementById('problem-title');
@@ -606,11 +611,15 @@ const closeInstructionsBtn = document.getElementById('close-instructions');
 const closeHighScoresBtn = document.getElementById('close-high-scores');
 const scoresList = document.getElementById('scores-list');
 
+// New Buttons for Navigation
+const returnMenuBtn = document.getElementById('return-menu-btn');
+const previousBtn = document.getElementById('previous-btn');
+
 // Initialize CodeMirror Editor
 let editor = CodeMirror.fromTextArea(document.getElementById('user-code'), {
     mode: "javascript",
-    theme: "monokai", // Changed to a more visually appealing theme
-    lineNumbers: false, // Disable line numbers
+    theme: "monokai",
+    lineNumbers: true, // Re-enabled line numbers for better navigation
     gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
     indentUnit: 4,
     tabSize: 4,
@@ -632,18 +641,21 @@ function saveProgress() {
     userSolutions[problems[currentProblemIndex].id] = editor.getValue();
     localStorage.setItem('userSolutions', JSON.stringify(userSolutions));
 
-    // Save current problem index, score, and level
+    // Save current problem index, score, level, and solved problems
     localStorage.setItem('currentProblemIndex', currentProblemIndex);
     localStorage.setItem('score', score);
     localStorage.setItem('level', level);
+    localStorage.setItem('solvedProblems', JSON.stringify(solvedProblems));
 }
 
 // Function to load progress from localStorage
 function loadProgress() {
-    // Load saved currentProblemIndex, score, and level
+    // Load saved currentProblemIndex, score, level, and solved problems
     const savedProblemIndex = localStorage.getItem('currentProblemIndex');
     const savedScore = localStorage.getItem('score');
     const savedLevel = localStorage.getItem('level');
+    const savedSolvedProblems = JSON.parse(localStorage.getItem('solvedProblems')) || [];
+
     if (savedProblemIndex !== null) {
         currentProblemIndex = parseInt(savedProblemIndex);
     }
@@ -655,6 +667,7 @@ function loadProgress() {
         level = parseInt(savedLevel);
         levelDisplay.innerText = level;
     }
+    solvedProblems = savedSolvedProblems;
 }
 
 // Load a Problem
@@ -672,8 +685,40 @@ function loadProblem(index) {
     resultSection.className = '';
     hintBtn.style.display = 'inline-block';
     runCodeBtn.disabled = false;
-    nextBtn.style.display = 'none';
+    // only disable if next problem was not already solved
+    nextBtn.style.display = 'inline-block';
     problemNumberDisplay.innerText = `Problem: ${index + 1} / ${problems.length}`;
+
+    // Start the timer
+    problemStartTime = Date.now();
+}
+
+// Function to Go to the Previous Problem
+function previousProblem() {
+    // Save the current code before moving to the previous problem
+    saveProgress();
+
+    // Move to the previous problem
+    if (currentProblemIndex > 0) {
+        currentProblemIndex--;
+    } else {
+        currentProblemIndex = problems.length - 1; // Wrap around to the last problem
+    }
+    loadProblem(currentProblemIndex);
+}
+
+// Function to Go to the Next Problem
+function nextProblem() {
+    // Save the current code before moving to the next problem
+    saveProgress();
+
+    // Move to the next problem
+    if (currentProblemIndex < problems.length - 1) {
+        currentProblemIndex++;
+    } else {
+        currentProblemIndex = 0; // Wrap around to the first problem
+    }
+    loadProblem(currentProblemIndex);
 }
 
 // Run User Code
@@ -718,17 +763,25 @@ function runUserCode() {
         if (allPassed) {
             resultSection.innerText = 'All test cases passed!';
             resultSection.className = 'correct';
-            score += 10; // Increase score
-            level++; // Increase level
-            scoreDisplay.innerText = `Score: ${score}`;
-            levelDisplay.innerText = level;
+
+            // Calculate time taken
+            const timeTaken = (Date.now() - problemStartTime) / 1000; // in seconds
+
+            // Update score and level if the problem is solved for the first time
+            if (!solvedProblems.includes(problem.id)) {
+                solvedProblems.push(problem.id);
+                score += 10; // Increase score
+                level++; // Increase level
+                scoreDisplay.innerText = `Score: ${score}`;
+                levelDisplay.innerText = level;
+            }
+
+            // Save high score with time taken
+            saveHighScore(timeTaken);
+
             runCodeBtn.disabled = true;
             hintBtn.style.display = 'none';
             nextBtn.style.display = 'inline-block';
-
-            // Save high score
-            saveHighScore();
-
         } else {
             resultSection.innerText = errorMessage;
             resultSection.className = 'incorrect';
@@ -749,16 +802,6 @@ function showHint() {
     alert(`Hint: ${problem.hint}`);
 }
 
-// Next Problem
-function nextProblem() {
-    // Save the current code before moving to next problem
-    saveProgress();
-
-    // Move to next problem
-    currentProblemIndex = (currentProblemIndex + 1) % problems.length;
-    loadProblem(currentProblemIndex);
-}
-
 // Reset Progress
 function resetProgress() {
     if (confirm('Are you sure you want to reset your progress?')) {
@@ -766,9 +809,11 @@ function resetProgress() {
         localStorage.removeItem('currentProblemIndex');
         localStorage.removeItem('score');
         localStorage.removeItem('level');
+        localStorage.removeItem('solvedProblems');
         currentProblemIndex = 0;
         score = 0;
         level = 1;
+        solvedProblems = [];
         scoreDisplay.innerText = `Score: ${score}`;
         levelDisplay.innerText = level;
         loadProblem(currentProblemIndex);
@@ -776,12 +821,30 @@ function resetProgress() {
 }
 
 // Save High Score
-function saveHighScore() {
+function saveHighScore(timeTaken) {
     const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-    highScores.push({ score: score, date: new Date().toLocaleString() });
-    // Keep only top 5 scores
-    highScores.sort((a, b) => b.score - a.score);
-    if (highScores.length > 5) highScores.pop();
+
+    // Get the current problem id
+    const problemId = problems[currentProblemIndex].id;
+
+    // Find or create high scores for this problem
+    let problemHighScores = highScores.find(entry => entry.problemId === problemId);
+
+    if (!problemHighScores) {
+        problemHighScores = {
+            problemId: problemId,
+            scores: []
+        };
+        highScores.push(problemHighScores);
+    }
+
+    // Add the new time
+    problemHighScores.scores.push({ time: timeTaken, date: new Date().toLocaleString() });
+
+    // Keep only top 5 fastest times
+    problemHighScores.scores.sort((a, b) => a.time - b.time);
+    if (problemHighScores.scores.length > 5) problemHighScores.scores.pop();
+
     localStorage.setItem('highScores', JSON.stringify(highScores));
 }
 
@@ -789,9 +852,23 @@ function saveHighScore() {
 function displayHighScores() {
     const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     scoresList.innerHTML = '';
+
+    if (highScores.length === 0) {
+        scoresList.innerHTML = '<li>No high scores yet.</li>';
+        return;
+    }
+
     highScores.forEach((entry) => {
+        const problem = problems.find(p => p.id === entry.problemId);
         const li = document.createElement('li');
-        li.innerText = `Score: ${entry.score} - ${entry.date}`;
+        li.innerText = `Problem: ${problem ? problem.title : 'Unknown'}`;
+        const ul = document.createElement('ul');
+        entry.scores?.forEach((scoreEntry) => {
+            const liScore = document.createElement('li');
+            liScore.innerText = `Time: ${scoreEntry.time.toFixed(2)}s - ${scoreEntry.date}`;
+            ul.appendChild(liScore);
+        });
+        li.appendChild(ul);
         scoresList.appendChild(li);
     });
 }
@@ -799,6 +876,7 @@ function displayHighScores() {
 // Event Listeners
 runCodeBtn.addEventListener('click', runUserCode);
 hintBtn.addEventListener('click', showHint);
+previousBtn.addEventListener('click', previousProblem);
 nextBtn.addEventListener('click', nextProblem);
 resetBtn.addEventListener('click', resetProgress);
 
@@ -825,6 +903,12 @@ closeInstructionsBtn.addEventListener('click', () => {
 
 closeHighScoresBtn.addEventListener('click', () => {
     highScoresModal.style.display = 'none';
+});
+
+returnMenuBtn.addEventListener('click', () => {
+    saveProgress();
+    mainMenu.style.display = 'block';
+    gameScreen.style.display = 'none';
 });
 
 // Close modals when clicking outside of them
