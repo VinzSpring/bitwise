@@ -2,38 +2,75 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bitwise Operations Practice</title>
+    <title>Bitwise Quest</title>
+    <!-- Include Custom CSS -->
     <link rel="stylesheet" href="styles.css">
-    <!-- Include CodeMirror CSS -->
+    <!-- Include CodeMirror CSS AFTER custom CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <!-- Include CodeMirror Theme (Optional) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
 </head>
 <body>
     <div id="app">
-        <header>
-            <h1>Bitwise Operations Practice</h1>
-            <div id="score-section">
-                <p id="score-display">Score: 0</p>
-                <p id="problem-number">Problem: 1 / 40</p>
+        <!-- Main Menu -->
+        <div id="main-menu">
+            <h1>Bitwise Quest</h1>
+            <button id="start-game-btn">Start Adventure</button>
+            <button id="instructions-btn">Instructions</button>
+            <button id="high-scores-btn">High Scores</button>
+        </div>
+
+        <!-- Instructions Modal -->
+        <div id="instructions" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" id="close-instructions">&times;</span>
+                <h2>How to Play</h2>
+                <p>Welcome to Bitwise Quest! Embark on an adventure to master bitwise operations.</p>
+                <p>Each level presents you with a challenge. Write your code in the editor to solve it using bitwise operations.</p>
+                <p>Pass all test cases to advance to the next level. Collect points and climb the leaderboard!</p>
             </div>
-        </header>
-        <main>
-            <div id="problem-section">
-                <h2 id="problem-title"></h2>
-                <p id="problem-description"></p>
-                <div id="code-editor">
-                    <textarea id="user-code" placeholder="Write your code here..."></textarea>
-                </div>
-                <div id="buttons">
-                    <button id="run-code-btn">Run Code</button>
-                    <button id="hint-btn">Show Hint</button>
-                    <button id="next-btn">Next Problem</button>
-                </div>
-                <div id="result-section"></div>
+        </div>
+
+        <!-- High Scores Modal -->
+        <div id="high-scores" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" id="close-high-scores">&times;</span>
+                <h2>High Scores</h2>
+                <ol id="scores-list">
+                    <!-- High scores will be populated here -->
+                </ol>
             </div>
-        </main>
-        <footer>
-            <p>© 2024 Bitwise Practice App</p>
-        </footer>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" style="display: none;">
+            <header>
+                <h1>Bitwise Quest - Level <span id="level-display">1</span></h1>
+                <div id="score-section">
+                    <p id="score-display">Score: 0</p>
+                    <p id="problem-number">Problem: 1 / 40</p>
+                </div>
+                <button id="reset-btn">Reset Progress</button>
+            </header>
+            <main>
+                <div id="problem-section">
+                    <h2 id="problem-title"></h2>
+                    <p id="problem-description"></p>
+                    <div id="code-editor">
+                        <textarea id="user-code" placeholder="Write your code here..."></textarea>
+                    </div>
+                    <div id="buttons">
+                        <button id="run-code-btn">Run Code</button>
+                        <button id="hint-btn">Show Hint</button>
+                        <button id="next-btn" style="display: none;">Next Level</button>
+                    </div>
+                    <div id="result-section"></div>
+                </div>
+            </main>
+            <footer>
+                <p>© 2024 Bitwise Quest</p>
+            </footer>
+        </div>
     </div>
     <!-- Include CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>

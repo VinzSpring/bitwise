@@ -1,9 +1,12 @@
+/* styles.css */
+
 /* General Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f7f9fc;
+    background-color: #1e272e;
     margin: 0;
     padding: 0;
+    color: #fff;
 }
 
 #app {
@@ -12,13 +15,76 @@ body {
     padding: 20px;
 }
 
+/* Main Menu Styles */
+#main-menu {
+    text-align: center;
+    margin-top: 100px;
+}
+
+#main-menu h1 {
+    font-size: 3em;
+    margin-bottom: 50px;
+    color: #f1c40f;
+}
+
+#main-menu button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    margin: 10px;
+    background-color: #0abde3;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#main-menu button:hover {
+    background-color: #54a0ff;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+}
+
+.modal-content {
+    background-color: #2f3640;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #fff;
+    width: 80%;
+    color: #fff;
+    border-radius: 8px;
+}
+
+.close-btn {
+    color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: #f1c40f;
+}
+
+/* Game Screen Styles */
 header, footer {
     text-align: center;
     margin-bottom: 20px;
 }
 
 header h1 {
-    color: #333;
+    color: #f1c40f;
 }
 
 #score-section {
@@ -29,13 +95,13 @@ header h1 {
 
 #score-display, #problem-number {
     font-size: 1.1em;
-    color: #555;
+    color: #fff;
 }
 
 main {
-    background-color: #fff;
+    background-color: #34495e;
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     border-radius: 8px;
 }
 
@@ -44,22 +110,57 @@ main {
 }
 
 #problem-title {
-    color: #2c3e50;
+    color: #1abc9c;
 }
 
 #problem-description {
     font-size: 1.1em;
-    color: #34495e;
+    color: #ecf0f1;
 }
 
 #code-editor {
     margin: 20px 0;
 }
 
+/* CodeMirror Styles */
 .CodeMirror {
-    height: 200px;
+    height: auto;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #fff;
+    background-color: #2c3e50;
+    box-sizing: border-box; /* Ensure proper sizing */
+    border: 1px solid #34495e;
+    border-radius: 4px;
 }
 
+/* Ensure gutters (line numbers) are styled correctly */
+.CodeMirror-gutters {
+    background-color: #2c3e50;
+    border-right: 1px solid #34495e;
+}
+
+.CodeMirror-linenumber {
+    color: #7f8c8d;
+    padding: 0 5px;
+}
+
+/* Prevent overlapping by ensuring correct display */
+.CodeMirror-code {
+    padding-left: 0; /* Reset padding if overridden */
+}
+
+.CodeMirror-lines {
+    padding: 4px 0; /* Ensure proper spacing */
+}
+
+/* Prevent box-sizing conflicts within CodeMirror */
+.CodeMirror, .CodeMirror * {
+    box-sizing: border-box;
+}
+
+/* Buttons */
 button {
     padding: 10px 20px;
     font-size: 1em;
@@ -70,18 +171,28 @@ button {
 }
 
 #run-code-btn {
-    background-color: #3498db;
+    background-color: #27ae60;
     color: #fff;
 }
 
 #hint-btn {
-    background-color: #f1c40f;
+    background-color: #e67e22;
     color: #fff;
 }
 
 #next-btn {
-    background-color: #2ecc71;
+    background-color: #8e44ad;
     color: #fff;
+}
+
+#reset-btn {
+    background-color: #c0392b;
+    color: #fff;
+    margin-top: 10px;
+}
+
+#reset-btn:hover {
+    background-color: #e74c3c;
 }
 
 #result-section {
@@ -90,13 +201,23 @@ button {
 }
 
 .correct {
-    color: #27ae60;
+    color: #2ecc71;
 }
 
 .incorrect {
-    color: #c0392b;
+    color: #e74c3c;
 }
 
 footer p {
     color: #95a5a6;
+}
+
+/* High Scores List */
+#scores-list {
+    list-style-type: decimal;
+}
+
+#scores-list li {
+    font-size: 1.2em;
+    margin: 5px 0;
 }
